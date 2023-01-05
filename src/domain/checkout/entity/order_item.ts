@@ -19,6 +19,12 @@ export default class OrderItem {
     this._quantity = quantity;
   }
 
+  _validate() {
+    if (this._quantity <= 0) {
+      throw new Error("Quantity must be greater than 0");
+    }
+  }
+
   get id(): string {
     return this._id;
   }
@@ -36,6 +42,15 @@ export default class OrderItem {
   }
 
   get price(): number {
+    return this._price;
+  }
+
+  get total(): number {
     return this._price * this._quantity;
+  }
+
+  changeQuantity(newQuantity: number) {
+    this._quantity = newQuantity;
+    this._validate()
   }
 }

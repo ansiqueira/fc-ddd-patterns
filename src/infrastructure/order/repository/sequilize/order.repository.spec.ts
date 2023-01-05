@@ -81,4 +81,74 @@ describe("Order repository test", () => {
       ],
     });
   });
+
+  it("should update an order", async () => {
+    const customerRepository = new CustomerRepository();
+    const customer = new Customer("123", "Customer 1");
+    const address = new Address("Street 1", 1, "Zipcode 1", "City 1");
+    customer.changeAddress(address);
+    await customerRepository.create(customer);
+
+    const productRepository = new ProductRepository();
+    const product = new Product("123", "Product 1", 10);
+    await productRepository.create(product);
+
+    const ordemItem = new OrderItem(
+      "1",
+      product.name,
+      product.price,
+      product.id,
+      1
+    );
+    const order = new Order("123", "123", [ordemItem]);
+    const orderRepository = new OrderRepository();
+    await orderRepository.create(order);
+
+    const orderCreated = await orderRepository.find(order.id)
+    expect(orderCreated).toStrictEqual(order);
+    expect(orderCreated.total()).toBe(10);
+    
+    orderCreated.items[0].changeQuantity(3);
+    
+    await orderRepository.update(orderCreated);
+    const orderUpdated = await orderRepository.find(order.id)
+    
+    expect(orderUpdated.total()).toBe(30)
+  });
+
+  it('should return a list with all orders', async () => {
+    const customerRepository = new CustomerRepository();
+    const customer = new Customer("123", "Customer 1");
+    const address = new Address("Street 1", 1, "Zipcode 1", "City 1");
+    customer.changeAddress(address);
+    await customerRepository.create(customer);
+
+    const productRepository = new ProductRepository();
+    const product = new Product("123", "Product 1", 10);
+    await productRepository.create(product);
+
+    const ordemItem = new OrderItem(
+      "1",
+      product.name,
+      product.price,
+      product.id,
+      1
+    );
+
+    const order = new Order("123", "123", [ordemItem]);
+
+    const orderRepository = new OrderRepository();
+    await orderRepository.create(order);
+
+    const orders = await orderRepository.findAll();
+
+    expect(orders.length).toBe(1);
+    expect(orders[0]).toStrictEqual(order);
+  });
+
+  it('should return an empty list', async () => {
+    const orderRepository = new OrderRepository();
+    const orders = await orderRepository.findAll();
+    expect(orders.length).toBe(0);
+  })
 });
